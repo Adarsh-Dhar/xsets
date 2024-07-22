@@ -1,23 +1,41 @@
 // SPDX-License-Identifier: Apache2
 pragma solidity ^0.8.3;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/utils/Pausable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol";
 
-import "../interfaces/IWormhole.sol";
-import "../libraries/BytesLib.sol";
-import "../nftHelpers/NFTStructs.sol";
-import "../nftHelpers/NFTGetters.sol";
-import "../nftHelpers/NFTSetters.sol";
-import "../interfaces/IWormhole721.sol";
+import "./interfaces/IWormhole.sol";
+import "./libraries/BytesLib.sol";
+import "./nftHelpers/NFTStructs.sol";
+import "./nftHelpers/NFTGetters.sol";
+import "./nftHelpers/NFTSetters.sol";
+import "./interfaces/IWormhole721.sol";
 
-contract Wormhole721 is ERC721, IWormhole721, NFTGetters, NFTSetters, Pausable, Ownable {
+contract Wormhole721Upgradeable is
+  ERC721Upgradeable,
+  IWormhole721,
+  NFTGetters,
+  NFTSetters,
+  PausableUpgradeable,
+  OwnableUpgradeable,
+  UUPSUpgradeable
+{
   using BytesLib for bytes;
 
-  constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
+  // solhint-disable-next-line func-name-mixedcase
+  function __Wormhole721_init(string memory name, string memory symbol) internal virtual initializer {
+    __Ownable_init();
+    __Pausable_init();
+    __UUPSUpgradeable_init();
+    __ERC721_init(name, symbol);
+  }
 
-  function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721) returns (bool) {
+  function _authorizeUpgrade(address newImplementation) internal virtual override onlyOwner {}
+
+  function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721Upgradeable) returns (bool) {
     return interfaceId == type(IWormhole721).interfaceId || super.supportsInterface(interfaceId);
   }
 
@@ -132,4 +150,10 @@ contract Wormhole721 is ERC721, IWormhole721, NFTGetters, NFTSetters, Pausable, 
     (address to, uint256 tokenId) = _wormholeCompleteTransfer(encodedVm);
     _safeMint(to, tokenId);
   }
+
+  // convenience helper
+
+  //  function getIWormhole721InterfaceId() external pure returns(bytes4) {
+  //    return type(IWormhole721).interfaceId;
+  //  }
 }
