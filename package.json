@@ -3,6 +3,8 @@
     "@aptos-labs/wallet-adapter-ant-design": "^3.0.4",
     "@aptos-labs/wallet-adapter-react": "^3.5.4",
     "@openzeppelin/contracts-upgradeable": "^5.0.2",
-    "petra-plugin-wallet-adapter": "^0.4.5"
+    "ethers": "^6.13.2",
+    "petra-plugin-wallet-adapter": "^0.4.5",
+    "recoil": "^0.7.7"
   }
 }
